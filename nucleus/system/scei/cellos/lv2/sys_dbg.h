@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
@@ -45,59 +46,59 @@ struct sys_dbg_spu_thread_context2_t {
 };
 
 // SysCalls
-S32 sys_dbg_continue_processes();
-S32 sys_dbg_continue_threads();
-S32 sys_dbg_create_kernel_event_queue();
-S32 sys_dbg_create_scratch_data_area_ext();
-S32 sys_dbg_destroy_kernel_event_queue();
-S32 sys_dbg_disable_floating_point_enabled_exception();
-S32 sys_dbg_enable_floating_point_enabled_exception();
-S32 sys_dbg_finalize_ppu_exception_handler();
-S32 sys_dbg_get_address_from_dabr();
-S32 sys_dbg_get_cond_list();
-S32 sys_dbg_get_cond_information();
-S32 sys_dbg_get_event_flag_list();
-S32 sys_dbg_get_event_flag_information();
-S32 sys_dbg_get_event_queue_list();
-S32 sys_dbg_get_event_queue_information();
-S32 sys_dbg_get_kernel_thread_list();
-S32 sys_dbg_get_kernel_thread_info();
-S32 sys_dbg_get_lwmutex_list();
-S32 sys_dbg_get_lwmutex_information();
-S32 sys_dbg_get_lwcond_list();
-S32 sys_dbg_get_lwcond_information();
-S32 sys_dbg_get_mutex_list();
-S32 sys_dbg_get_mutex_information();
-S32 sys_dbg_get_process_event_ctrl_flag();
-S32 sys_dbg_get_raw_spu_list();
-S32 sys_dbg_get_rwlock_list();
-S32 sys_dbg_get_rwlock_information();
-S32 sys_dbg_get_semaphore_list();
-S32 sys_dbg_get_semaphore_information();
-S32 sys_dbg_get_spu_thread_group_event_cntl_flag();
-S32 sys_dbg_get_thread_list(U32 pid, U64* ids, U64* ids_num, U64* all_ids_num);
-S32 sys_dbg_get_ppu_thread_name();
-S32 sys_dbg_get_process_list();
-S32 sys_dbg_get_process_info();
-S32 sys_dbg_initialize_ppu_exception_handler();
-S32 sys_dbg_kill_process();
-S32 sys_dbg_ppu_exception_handler();
-S32 sys_dbg_read_kernel_event_queue();
-S32 sys_dbg_read_process_memory();
-S32 sys_dbg_read_thread_register();
-S32 sys_dbg_read_spu_thread_context2();
-S32 sys_dbg_set_address_to_dabr();
-S32 sys_dbg_set_process_event_cntl_flag();
-S32 sys_dbg_set_run_control_bit_to_spu();
-S32 sys_dbg_set_spu_thread_group_event_cntl_flag();
-S32 sys_dbg_spu_thread_get_exception_cause();
-S32 sys_dbg_spu_thread_read_from_ls();
-S32 sys_dbg_spu_thread_write_to_ls();
-S32 sys_dbg_stop_processes();
-S32 sys_dbg_stop_threads();
-S32 sys_dbg_vm_get_page_information();
-S32 sys_dbg_vm_get_info();
-S32 sys_dbg_write_process_memory();
-S32 sys_dbg_write_thread_register();
+HLE_FUNCTION(sys_dbg_continue_processes);
+HLE_FUNCTION(sys_dbg_continue_threads);
+HLE_FUNCTION(sys_dbg_create_kernel_event_queue);
+HLE_FUNCTION(sys_dbg_create_scratch_data_area_ext);
+HLE_FUNCTION(sys_dbg_destroy_kernel_event_queue);
+HLE_FUNCTION(sys_dbg_disable_floating_point_enabled_exception);
+HLE_FUNCTION(sys_dbg_enable_floating_point_enabled_exception);
+HLE_FUNCTION(sys_dbg_finalize_ppu_exception_handler);
+HLE_FUNCTION(sys_dbg_get_address_from_dabr);
+HLE_FUNCTION(sys_dbg_get_cond_list);
+HLE_FUNCTION(sys_dbg_get_cond_information);
+HLE_FUNCTION(sys_dbg_get_event_flag_list);
+HLE_FUNCTION(sys_dbg_get_event_flag_information);
+HLE_FUNCTION(sys_dbg_get_event_queue_list);
+HLE_FUNCTION(sys_dbg_get_event_queue_information);
+HLE_FUNCTION(sys_dbg_get_kernel_thread_list);
+HLE_FUNCTION(sys_dbg_get_kernel_thread_info);
+HLE_FUNCTION(sys_dbg_get_lwmutex_list);
+HLE_FUNCTION(sys_dbg_get_lwmutex_information);
+HLE_FUNCTION(sys_dbg_get_lwcond_list);
+HLE_FUNCTION(sys_dbg_get_lwcond_information);
+HLE_FUNCTION(sys_dbg_get_mutex_list);
+HLE_FUNCTION(sys_dbg_get_mutex_information);
+HLE_FUNCTION(sys_dbg_get_process_event_ctrl_flag);
+HLE_FUNCTION(sys_dbg_get_raw_spu_list);
+HLE_FUNCTION(sys_dbg_get_rwlock_list);
+HLE_FUNCTION(sys_dbg_get_rwlock_information);
+HLE_FUNCTION(sys_dbg_get_semaphore_list);
+HLE_FUNCTION(sys_dbg_get_semaphore_information);
+HLE_FUNCTION(sys_dbg_get_spu_thread_group_event_cntl_flag);
+HLE_FUNCTION(sys_dbg_get_thread_list, U32 pid, U64* ids, U64* ids_num, U64* all_ids_num);
+HLE_FUNCTION(sys_dbg_get_ppu_thread_name);
+HLE_FUNCTION(sys_dbg_get_process_list);
+HLE_FUNCTION(sys_dbg_get_process_info);
+HLE_FUNCTION(sys_dbg_initialize_ppu_exception_handler);
+HLE_FUNCTION(sys_dbg_kill_process);
+HLE_FUNCTION(sys_dbg_ppu_exception_handler);
+HLE_FUNCTION(sys_dbg_read_kernel_event_queue);
+HLE_FUNCTION(sys_dbg_read_process_memory);
+HLE_FUNCTION(sys_dbg_read_thread_register);
+HLE_FUNCTION(sys_dbg_read_spu_thread_context2);
+HLE_FUNCTION(sys_dbg_set_address_to_dabr);
+HLE_FUNCTION(sys_dbg_set_process_event_cntl_flag);
+HLE_FUNCTION(sys_dbg_set_run_control_bit_to_spu);
+HLE_FUNCTION(sys_dbg_set_spu_thread_group_event_cntl_flag);
+HLE_FUNCTION(sys_dbg_spu_thread_get_exception_cause);
+HLE_FUNCTION(sys_dbg_spu_thread_read_from_ls);
+HLE_FUNCTION(sys_dbg_spu_thread_write_to_ls);
+HLE_FUNCTION(sys_dbg_stop_processes);
+HLE_FUNCTION(sys_dbg_stop_threads);
+HLE_FUNCTION(sys_dbg_vm_get_page_information);
+HLE_FUNCTION(sys_dbg_vm_get_info);
+HLE_FUNCTION(sys_dbg_write_process_memory);
+HLE_FUNCTION(sys_dbg_write_thread_register);
 
 }  // namespace sys

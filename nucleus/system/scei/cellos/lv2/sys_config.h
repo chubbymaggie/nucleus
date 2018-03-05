@@ -6,12 +6,13 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
 // SysCalls
-S32 sys_config_add_service_listener();
-S32 sys_config_close();
-S32 sys_config_open();
+HLE_FUNCTION(sys_config_add_service_listener);
+HLE_FUNCTION(sys_config_close);
+HLE_FUNCTION(sys_config_open);
 
 }  // namespace sys

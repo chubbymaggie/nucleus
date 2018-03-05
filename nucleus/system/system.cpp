@@ -5,12 +5,17 @@
 
 #pragma once
 
-#include "nucleus/common.h"
-#include "../hle_macro.h"
+#include "system.h"
 
 namespace sys {
 
-// Functions
-HLE_FUNCTION(cellVideoOutGetGamma);
+System::System(Emulator* emulator) : m_emulator(emulator)
+{
+}
+
+Emulator* System::getEmulator() const
+{
+    return m_emulator;
+}
 
 }  // namespace sys

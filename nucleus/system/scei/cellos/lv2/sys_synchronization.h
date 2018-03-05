@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 // Constants
 enum {

@@ -4,23 +4,23 @@
  */
 
 #include "sys_time.h"
-#include "nucleus/system/scei/cellos/lv2.h"
+#include "../lv2.h"
 
 namespace sys {
 
-S32 sys_time_get_timezone(BE<U32>* timezone, BE<U32>* summertime) {
+HLE_FUNCTION(sys_time_get_timezone, BE<U32>* timezone, BE<U32>* summertime) {
     *timezone = 1;
     *summertime = 1;
     return CELL_OK;
 }
 
-S32 sys_time_get_current_time(BE<U64>* sec, BE<U64>* nsec) {
+HLE_FUNCTION(sys_time_get_current_time, BE<U64>* sec, BE<U64>* nsec) {
     *sec = 1;
     *nsec = 1;
     return CELL_OK;
 }
 
-U64 sys_time_get_timebase_frequency() {
+HLE_FUNCTION(sys_time_get_timebase_frequency) {
     return 79800000;
 }
 

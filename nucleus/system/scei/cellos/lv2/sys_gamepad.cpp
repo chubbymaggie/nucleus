@@ -4,11 +4,11 @@
  */
 
 #include "sys_gamepad.h"
-#include "nucleus/system/scei/cellos/lv2.h"
+#include "../lv2.h"
 
 namespace sys {
 
-S32 sys_gamepad_ycon_if() {
+HLE_FUNCTION(sys_gamepad_ycon_if) {
     // TODO: ?
     return CELL_OK;
 }

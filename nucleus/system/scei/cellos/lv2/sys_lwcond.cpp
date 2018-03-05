@@ -4,24 +4,21 @@
  */
 
 #include "sys_lwcond.h"
-#include "nucleus/emulator.h"
+#include "../lv2.h"
 #include "nucleus/logger/logger.h"
-#include "nucleus/system/scei/cellos/lv2.h"
 #include "nucleus/system/scei/cellos/lv2/sys_lwmutex.h"
 
 namespace sys {
 
-S32 sys_lwcond_create(BE<U32>* lwcond_id, U32 lwmutex_id, sys_lwcond_attribute_t* attr) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* lwmutex = lv2.objects.get<sys_lwmutex_t>(lwmutex_id);
+HLE_FUNCTION(sys_lwcond_create, BE<U32>* lwcond_id, U32 lwmutex_id, sys_lwcond_attribute_t* attr) {
+    auto* lwmutex = kernel.objects.get<sys_lwmutex_t>(lwmutex_id);
 
     // Check requisites
     if (!lwmutex) {
         return CELL_ESRCH;
     }
-    if ((lwcond_id == nucleus.memory->ptr(0)) ||
-        (attr == nucleus.memory->ptr(0))) {
+    if ((lwcond_id == kernel.memory->ptr(0)) ||
+        (attr == kernel.memory->ptr(0))) {
         return CELL_EFAULT;
     }
 
@@ -30,23 +27,19 @@ S32 sys_lwcond_create(BE<U32>* lwcond_id, U32 lwmutex_id, sys_lwcond_attribute_t
     lwcond->lwmutex = lwmutex;
     lwcond->attr = *attr;
 
-    *lwcond_id = lv2.objects.add(lwcond, SYS_LWCOND_OBJECT);
+    *lwcond_id = kernel.objects.add(lwcond, SYS_LWCOND_OBJECT);
     return CELL_OK;
 }
 
-S32 sys_lwcond_destroy(U32 lwcond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    if (!lv2.objects.remove(lwcond_id)) {
+HLE_FUNCTION(sys_lwcond_destroy, U32 lwcond_id) {
+    if (!kernel.objects.remove(lwcond_id)) {
         return CELL_ESRCH;
     }
     return CELL_OK;
 }
 
-S32 sys_lwcond_signal(U32 lwcond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* lwcond = lv2.objects.get<sys_lwcond_t>(lwcond_id);
+HLE_FUNCTION(sys_lwcond_signal, U32 lwcond_id) {
+    auto* lwcond = kernel.objects.get<sys_lwcond_t>(lwcond_id);
 
     // Check requisites
     if (!lwcond) {
@@ -57,10 +50,8 @@ S32 sys_lwcond_signal(U32 lwcond_id) {
     return CELL_OK;
 }
 
-S32 sys_lwcond_signal_all(U32 lwcond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* lwcond = lv2.objects.get<sys_lwcond_t>(lwcond_id);
+HLE_FUNCTION(sys_lwcond_signal_all, U32 lwcond_id) {
+    auto* lwcond = kernel.objects.get<sys_lwcond_t>(lwcond_id);
 
     // Check requisites
     if (!lwcond) {
@@ -71,10 +62,8 @@ S32 sys_lwcond_signal_all(U32 lwcond_id) {
     return CELL_OK;
 }
 
-S32 sys_lwcond_queue_wait(U32 lwcond_id, U64 timeout) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* lwcond = lv2.objects.get<sys_lwcond_t>(lwcond_id);
+HLE_FUNCTION(sys_lwcond_queue_wait, U32 lwcond_id, U64 timeout) {
+    auto* lwcond = kernel.objects.get<sys_lwcond_t>(lwcond_id);
 
     // Check requisites
     if (!lwcond) {

@@ -11,6 +11,12 @@ namespace cpu {
 
 class HostCPU : public CPU {
 public:
+    HostCPU(Emulator* emulator, mem::Memory* memory);
+
+    // Thread management
+    virtual void run() override;
+    virtual void pause() override;
+    virtual void stop() override;
 };
 
 }  // namespace cpu

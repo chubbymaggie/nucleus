@@ -13,8 +13,8 @@
 
 namespace ui {
 
-UI::UI(std::shared_ptr<gfx::GraphicsBackend> backend, Size width, Size height) :
-    graphics(std::move(backend)), language(), surface(width, height) {
+UI::UI(gfx::GraphicsBackend* backend, Size width, Size height) :
+    graphics(backend), language(), surface(width, height) {
     cmdQueue = graphics->getGraphicsCommandQueue();
 }
 
@@ -50,7 +50,7 @@ void UI::task() {
     screens.push_back(std::make_unique<ScreenLogo>(this));
 #endif
     while (true) {
-        surface.update(graphics.get());
+        surface.update(graphics);
         const gfx::Viewport viewport = { 0, 0, surface.getWidth(), surface.getHeight() };
         const gfx::Rectangle scissor = { 0, 0, surface.getWidth(), surface.getHeight() };
 

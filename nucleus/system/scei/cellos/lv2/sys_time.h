@@ -6,12 +6,13 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
 // SysCalls
-S32 sys_time_get_timezone(BE<U32>* timezone, BE<U32>* summertime);
-S32 sys_time_get_current_time(BE<U64>* sec, BE<U64>* nsec);
-U64 sys_time_get_timebase_frequency();
+HLE_FUNCTION(sys_time_get_timezone, BE<U32>* timezone, BE<U32>* summertime);
+HLE_FUNCTION(sys_time_get_current_time, BE<U64>* sec, BE<U64>* nsec);
+HLE_FUNCTION(sys_time_get_timebase_frequency);
 
 }  // namespace sys

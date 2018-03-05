@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
@@ -22,8 +23,8 @@ enum
     SYS_SPUIMAGE_OBJECT             = 0x22,
     SYS_PRX_OBJECT                  = 0x23,
     SYS_SPUPORT_OBJECT              = 0x24,
-    SYS_SERVICE_LISTENER_OBJECT     = 0x41,  // base system config handle
-    SYS_SERVICE_LISTENER_OBJECT     = 0x42,  // a system config service listener
+    SYS_SERVICE_LISTENER_OBJECT_41  = 0x41,  // base system config handle
+    SYS_SERVICE_LISTENER_OBJECT_42  = 0x42,  // a system config service listener
     SYS_SERVICE_OBJECT              = 0x43,  // a system config service
     SYS_FS_FD_OBJECT                = 0x73,
     SYS_MUTEX_OBJECT                = 0x85,
@@ -47,7 +48,8 @@ enum
     SYS_CRYPTO_OBJECT               = 0x78,  // crypto_engine
 
     // TODO: Are these even objects?
-    //SYS_SPU_THREAD_OBJECT           = 0x02, // no object with this ID into LV2 kernel
+    SYS_PPU_THREAD_OBJECT           = 0x01,
+    SYS_SPU_THREAD_OBJECT           = 0x02, // no object with this ID into LV2 kernel
     SYS_SPU_THREAD_GROUP_OBJECT     = 0x04,
 };
 
@@ -91,8 +93,8 @@ struct sys_process_info_t
 	BE<U32> pp_id;          // 0x14: parent process ID
 	char *binary_path;      // 0x18: pointer to a char buffer of 0x200 in size, holding process binary path
 	BE<U32> total_mem;      // 0x1C: total memory(user space) size in byte
-	U8 osabi_type;          // 0x20: OS ABI type
-	U8 pad[7];              // 0x21: padding
+	U08 osabi_type;         // 0x20: OS ABI type
+	U08 pad[7];             // 0x21: padding
 	BE<U64> intr_mask;      // 0x28: process interrupt bitmap mask
 	BE<U32> trace_id;       // 0x30: trace ID, for debugging
 };
@@ -100,9 +102,9 @@ struct sys_process_info_t
 // process param sfo
 struct sys_param_sfo_t
 {
-    U8 flag;            // 0x00: 1(exist), 0xFF(process have no param_sfo, e.g. VSH process)
-    char title_id[9]    // 0x01: (8+'/0'), format: "ABCD1234"
-    U8 pad[6];          // 0x0A: padding
+    U08 flag;           // 0x00: 1(exist), 0xFF(process have no param_sfo, e.g. VSH process)
+    char title_id[9];   // 0x01: (8+'/0'), format: "ABCD1234"
+    U08 pad[6];         // 0x0A: padding
     BE<U64> param_0;    // 0x10: ? sys_process_param_t.crash_dump_param_addr related
     BE<U64> param_1;    // 0x18: ?
     BE<U64> param_2;    // 0x20: ?
@@ -126,36 +128,36 @@ struct sys_process_t {
 };
 
 // SysCalls
-S32 sys_process_getpid();
-S32 sys_process_getppid();
-S32 sys_process_get_number_of_object(U32 object, BE<U32>* nump);
-S32 sys_process_get_id(U32 object, BE<U32>* buffer, U32 size, BE<U32>* set_size);
-S32 sys_process_get_paramsfo(U08* buffer);
-S32 sys_process_get_sdk_version(U32 pid, BE<U32>* version);
-S32 sys_process_get_status(U64 unk);
-S32 sys_process_exit(S32 errorcode);
-S32 sys_process_kill(U32 pid);
-S32 sys_process_wait_for_child(U32 pid, BE<U32>* status, U64 unk);
-S32 sys_process_wait_for_child2(U64 unk1, U64 unk2, U64 unk3, U64 unk4, U64 unk5, U64 unk6);
-S32 sys_process_detach_child(U64 unk);
-S32 sys_process_is_spu_lock_line_reservation_address(U32 addr, U64 flags);
-void sys_game_process_exitspawn(U32 path_addr, U32 argv_addr, U32 envp_addr, U32 data_addr, U32 data_size, U32 prio, U64 flags);
-void sys_game_process_exitspawn2(U32 path_addr, U32 argv_addr, U32 envp_addr, U32 data_addr, U32 data_size, U32 prio, U64 flags);
-S32 sys_process_wait_for_child(BE<U32>* child_proc_id, BE<U32>* status, U32 flag);
-S32 sys_process_get_status(U32 proc_id);
-S32 sys_process_detach_child(U32 child_proc_id);
-S32 sys_process_get_number_of_object(U32 obj_type, BE<U32>* count);
-S32 sys_process_get_id(U32 obj_type, BE<U32>* id_list, U32 id_list_size, BE<U32>* count);
-S32 sys_process_kill(U32 proc_id);
-S32 sys_process_spawn(BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U64 intr_mask, U32 trace_id);
-S32 sys_process_exit2(S32 exit_status, BE<U32>* user_data, U32 user_data_size);
-S32 sys_process_wait_for_child2(BE<U32>* child_proc_id, BE<U32>* status, BE<U32>* data_out, U32 data_out_size, U32 arg_5, U32 flags);
-S32 sys_process_spawns_a_self(BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U64 proc_intr_mask, U32 trace_id, U32 mc_id);
-S32 sys_process_exit3(S32 exit_status, BE<U32>* user_data, U32 user_data_size, U32 flags);
-S32 sys_process_spawns_a_self2(BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U32 mc_id, sys_param_sfo_t* param_sfo, sys_process_dbg_t* dbg_data);
-S32 sys_process_get_number_of_object2(U32 obj_type);
-S32 sys_process_get_id2(U32 obj_type, BE<U32>* id_list, U32 id_list_size, BE<U32>* count);
-S32 sys_process_get_ppu_guid();
+HLE_FUNCTION(sys_process_getpid);
+HLE_FUNCTION(sys_process_getppid);
+HLE_FUNCTION(sys_process_get_number_of_object, U32 object, BE<U32>* nump);
+HLE_FUNCTION(sys_process_get_id, U32 object, BE<U32>* buffer, U32 size, BE<U32>* set_size);
+HLE_FUNCTION(sys_process_get_paramsfo, U08* buffer);
+HLE_FUNCTION(sys_process_get_sdk_version, U32 pid, BE<U32>* version);
+HLE_FUNCTION(sys_process_get_status, U64 unk);
+HLE_FUNCTION(sys_process_exit, S32 errorcode);
+HLE_FUNCTION(sys_process_kill, U32 pid);
+HLE_FUNCTION(sys_process_wait_for_child, U32 pid, BE<U32>* status, U64 unk);
+HLE_FUNCTION(sys_process_wait_for_child2, U64 unk1, U64 unk2, U64 unk3, U64 unk4, U64 unk5, U64 unk6);
+HLE_FUNCTION(sys_process_detach_child, U64 unk);
+HLE_FUNCTION(sys_process_is_spu_lock_line_reservation_address, U32 addr, U64 flags);
+HLE_FUNCTION(sys_game_process_exitspawn, U32 path_addr, U32 argv_addr, U32 envp_addr, U32 data_addr, U32 data_size, U32 prio, U64 flags);
+HLE_FUNCTION(sys_game_process_exitspawn2, U32 path_addr, U32 argv_addr, U32 envp_addr, U32 data_addr, U32 data_size, U32 prio, U64 flags);
+HLE_FUNCTION(sys_process_wait_for_child, BE<U32>* child_proc_id, BE<U32>* status, U32 flag);
+HLE_FUNCTION(sys_process_get_status, U32 proc_id);
+HLE_FUNCTION(sys_process_detach_child, U32 child_proc_id);
+HLE_FUNCTION(sys_process_get_number_of_object, U32 obj_type, BE<U32>* count);
+HLE_FUNCTION(sys_process_get_id, U32 obj_type, BE<U32>* id_list, U32 id_list_size, BE<U32>* count);
+HLE_FUNCTION(sys_process_kill, U32 proc_id);
+HLE_FUNCTION(sys_process_spawn, BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U64 intr_mask, U32 trace_id);
+HLE_FUNCTION(sys_process_exit2, S32 exit_status, BE<U32>* user_data, U32 user_data_size);
+HLE_FUNCTION(sys_process_wait_for_child2, BE<U32>* child_proc_id, BE<U32>* status, BE<U32>* data_out, U32 data_out_size, U32 arg_5, U32 flags);
+HLE_FUNCTION(sys_process_spawns_a_self, BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U64 proc_intr_mask, U32 trace_id, U32 mc_id);
+HLE_FUNCTION(sys_process_exit3, S32 exit_status, BE<U32>* user_data, U32 user_data_size, U32 flags);
+HLE_FUNCTION(sys_process_spawns_a_self2, BE<U32>* proc_id, S32 primary_prio, U32 flags, BE<U32>* stack, U32 stack_size, U32 mc_id, sys_param_sfo_t* param_sfo, sys_process_dbg_t* dbg_data);
+HLE_FUNCTION(sys_process_get_number_of_object2, U32 obj_type);
+HLE_FUNCTION(sys_process_get_id2, U32 obj_type, BE<U32>* id_list, U32 id_list_size, BE<U32>* count);
+HLE_FUNCTION(sys_process_get_ppu_guid);
 
     
 }  // namespace sys

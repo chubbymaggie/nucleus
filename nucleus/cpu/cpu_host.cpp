@@ -4,3 +4,24 @@
  */
 
 #include "cpu_host.h"
+
+namespace cpu {
+
+HostCPU::HostCPU(Emulator* emulator, mem::Memory* memory)
+    : CPU(emulator, memory)
+{
+}
+
+void HostCPU::run()
+{
+}
+
+void HostCPU::pause()
+{
+}
+
+void HostCPU::stop()
+{
+}
+
+}  // namespace cpu

@@ -5,9 +5,9 @@
 
 #include "sys_event.h"
 #include "sys_mutex.h"
-#include "nucleus/system/scei/cellos/lv2.h"
 #include "nucleus/cpu/cpu.h"
 #include "nucleus/emulator.h"
+#include "../lv2.h"
 
 // Avoid <Windows.h> macro collisions with std::min and std::max
 #if defined(NUCLEUS_TARGET_UWP) || defined(NUCLEUS_TARGET_WINDOWS)
@@ -22,11 +22,9 @@ namespace sys {
 /**
  * LV2: Event flags
  */
-S32 sys_event_flag_create(BE<U32>* eflag_id, sys_event_flag_attr_t* attr, U64 init) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
+HLE_FUNCTION(sys_event_flag_create, BE<U32>* eflag_id, sys_event_flag_attr_t* attr, U64 init) {
     // Check requisites
-    if (eflag_id == nucleus.memory->ptr(0) || attr == nucleus.memory->ptr(0)) {
+    if (eflag_id == kernel.memory->ptr(0) || attr == kernel.memory->ptr(0)) {
         return CELL_EFAULT;
     }
     if (attr->pshared != SYS_SYNC_PROCESS_SHARED && attr->pshared != SYS_SYNC_NOT_PROCESS_SHARED) {
@@ -38,23 +36,19 @@ S32 sys_event_flag_create(BE<U32>* eflag_id, sys_event_flag_attr_t* attr, U64 in
     eflag->attr = *attr;
     eflag->value = init;
 
-    *eflag_id = lv2.objects.add(eflag, SYS_EVENT_FLAG_OBJECT);
+    *eflag_id = kernel.objects.add(eflag, SYS_EVENT_FLAG_OBJECT);
     return CELL_OK;
 }
 
-S32 sys_event_flag_destroy(U32 eflag_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    if (!lv2.objects.remove(eflag_id)) {
+HLE_FUNCTION(sys_event_flag_destroy, U32 eflag_id) {
+    if (!kernel.objects.remove(eflag_id)) {
         return CELL_ESRCH;
     }
     return CELL_OK;
 }
 
-S32 sys_event_flag_wait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result, U64 timeout) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_wait, U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result, U64 timeout) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
     if (!eflag) {
@@ -90,7 +84,7 @@ S32 sys_event_flag_wait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result, U64
     }
 
     // Save value if required and exit if timeout occurred
-    if (result !=  nucleus.memory->ptr(0)) {
+    if (result != kernel.memory->ptr(0)) {
         *result = eflag->value;
     }
     if (!validCondition) {
@@ -107,10 +101,8 @@ S32 sys_event_flag_wait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result, U64
     return CELL_OK;
 }
 
-S32 sys_event_flag_trywait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_trywait, U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
     if (!eflag) {
@@ -123,7 +115,7 @@ S32 sys_event_flag_trywait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result) 
     std::unique_lock<std::mutex> lock(eflag->mutex);
 
     // Save value if required
-    if (result ==  nucleus.memory->ptr(0)) {
+    if (result == kernel.memory->ptr(0)) {
         *result = eflag->value;
     }
 
@@ -143,10 +135,8 @@ S32 sys_event_flag_trywait(U32 eflag_id, U64 bitptn, U32 mode, BE<U64>* result) 
     return CELL_EBUSY;
 }
 
-S32 sys_event_flag_set(U32 eflag_id, U64 bitptn) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_set, U32 eflag_id, U64 bitptn) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
     if (!eflag) {
@@ -158,10 +148,8 @@ S32 sys_event_flag_set(U32 eflag_id, U64 bitptn) {
     return CELL_OK;
 }
 
-S32 sys_event_flag_clear(U32 eflag_id, U64 bitptn) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_clear, U32 eflag_id, U64 bitptn) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
     if (!eflag) {
@@ -173,14 +161,12 @@ S32 sys_event_flag_clear(U32 eflag_id, U64 bitptn) {
     return CELL_OK;
 }
 
-S32 sys_event_flag_cancel(U32 eflag_id, BE<U32>* num) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_cancel, U32 eflag_id, BE<U32>* num) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
     if (!eflag) {
-        if (num == nucleus.memory->ptr(0)) {
+        if (num == kernel.memory->ptr(0)) {
             num = 0;
         }
         return CELL_ESRCH;
@@ -189,13 +175,11 @@ S32 sys_event_flag_cancel(U32 eflag_id, BE<U32>* num) {
     return CELL_OK;
 }
 
-S32 sys_event_flag_get(U32 eflag_id, BE<U64>* flags) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eflag = lv2.objects.get<sys_event_flag_t>(eflag_id);
+HLE_FUNCTION(sys_event_flag_get, U32 eflag_id, BE<U64>* flags) {
+    auto* eflag = kernel.objects.get<sys_event_flag_t>(eflag_id);
 
     // Check requisites
-    if (flags == nucleus.memory->ptr(0)) {
+    if (flags == kernel.memory->ptr(0)) {
         return CELL_EFAULT;
     }
     if (!eflag) {
@@ -209,11 +193,9 @@ S32 sys_event_flag_get(U32 eflag_id, BE<U64>* flags) {
 /**
  * LV2: Event ports
  */
-S32 sys_event_port_create(BE<U32>* eport_id, S32 port_type, U64 name) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
+HLE_FUNCTION(sys_event_port_create, BE<U32>* eport_id, S32 port_type, U64 name) {
     // Check requisites
-    if (eport_id == nucleus.memory->ptr(0)) {
+    if (eport_id == kernel.memory->ptr(0)) {
         return CELL_EFAULT;
     }
 
@@ -222,24 +204,20 @@ S32 sys_event_port_create(BE<U32>* eport_id, S32 port_type, U64 name) {
     eport-> type = port_type;
     eport->name_value = name;
 
-    *eport_id = lv2.objects.add(eport, SYS_EVENT_PORT_OBJECT);
+    *eport_id = kernel.objects.add(eport, SYS_EVENT_PORT_OBJECT);
     return CELL_OK;
 }
 
-S32 sys_event_port_destroy(U32 eport_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    if (!lv2.objects.remove(eport_id)) {
+HLE_FUNCTION(sys_event_port_destroy, U32 eport_id) {
+    if (!kernel.objects.remove(eport_id)) {
         return CELL_ESRCH;
     }
     return CELL_OK;
 }
 
-S32 sys_event_port_connect_local(U32 eport_id, U32 equeue_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eport = lv2.objects.get<sys_event_port_t>(eport_id);
-    auto* equeue = lv2.objects.get<sys_event_queue_t>(equeue_id);
+HLE_FUNCTION(sys_event_port_connect_local, U32 eport_id, U32 equeue_id) {
+    auto* eport = kernel.objects.get<sys_event_port_t>(eport_id);
+    auto* equeue = kernel.objects.get<sys_event_queue_t>(equeue_id);
 
     // Check requisites
     if (!eport || !equeue) {
@@ -256,10 +234,8 @@ S32 sys_event_port_connect_local(U32 eport_id, U32 equeue_id) {
     return CELL_OK;
 }
 
-S32 sys_event_port_disconnect(U32 eport_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eport = lv2.objects.get<sys_event_port_t>(eport_id);
+HLE_FUNCTION(sys_event_port_disconnect, U32 eport_id) {
+    auto* eport = kernel.objects.get<sys_event_port_t>(eport_id);
 
     // Check requisites
     if (!eport) {
@@ -270,10 +246,8 @@ S32 sys_event_port_disconnect(U32 eport_id) {
     return CELL_OK;
 }
 
-S32 sys_event_port_send(U32 eport_id, U64 data1, U64 data2, U64 data3) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* eport = lv2.objects.get<sys_event_port_t>(eport_id);
+HLE_FUNCTION(sys_event_port_send, U32 eport_id, U64 data1, U64 data2, U64 data3) {
+    auto* eport = kernel.objects.get<sys_event_port_t>(eport_id);
 
     // Check requisites
     if (!eport) {
@@ -294,11 +268,9 @@ S32 sys_event_port_send(U32 eport_id, U64 data1, U64 data2, U64 data3) {
 /**
  * LV2: Event queues
  */
-S32 sys_event_queue_create(BE<U32>* equeue_id, sys_event_queue_attr_t* attr, U64 event_queue_key, S32 size) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
+HLE_FUNCTION(sys_event_queue_create, BE<U32>* equeue_id, sys_event_queue_attr_t* attr, U64 event_queue_key, S32 size) {
     // Check requisites
-    if (equeue_id == nucleus.memory->ptr(0) || attr == nucleus.memory->ptr(0)) {
+    if (equeue_id == kernel.memory->ptr(0) || attr == kernel.memory->ptr(0)) {
         return CELL_EFAULT;
     }
     if (size < 1 || size > 127) {
@@ -309,24 +281,20 @@ S32 sys_event_queue_create(BE<U32>* equeue_id, sys_event_queue_attr_t* attr, U64
     auto* equeue = new sys_event_queue_t();
     equeue->attr = *attr;
 
-    *equeue_id = lv2.objects.add(equeue, SYS_EVENT_QUEUE_OBJECT);
+    *equeue_id = kernel.objects.add(equeue, SYS_EVENT_QUEUE_OBJECT);
     return CELL_OK;
 }
 
-S32 sys_event_queue_destroy(U32 equeue_id, S32 mode) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
+HLE_FUNCTION(sys_event_queue_destroy, U32 equeue_id, S32 mode) {
     // TODO: What's up with mode?
-    if (!lv2.objects.remove(equeue_id)) {
+    if (!kernel.objects.remove(equeue_id)) {
         return CELL_ESRCH;
     }
     return CELL_OK;
 }
 
-S32 sys_event_queue_receive(U32 equeue_id, sys_event_t* evt, U64 timeout) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* equeue = lv2.objects.get<sys_event_queue_t>(equeue_id);
+HLE_FUNCTION(sys_event_queue_receive, U32 equeue_id, sys_event_t* evt, U64 timeout) {
+    auto* equeue = kernel.objects.get<sys_event_queue_t>(equeue_id);
 
     // Check requisites
     if (!equeue) {
@@ -352,7 +320,7 @@ S32 sys_event_queue_receive(U32 equeue_id, sys_event_t* evt, U64 timeout) {
     equeue->queue.pop();
 
     // Event data is returned using registers
-    auto thread = (cpu::frontend::ppu::PPUThread*)nucleus.cpu->getCurrentThread();
+    auto thread = (cpu::frontend::ppu::PPUThread*)cpu::CPU::getCurrentThread();
     thread->state->r[4] = evt->source;
     thread->state->r[5] = evt->data1;
     thread->state->r[6] = evt->data2;
@@ -360,10 +328,8 @@ S32 sys_event_queue_receive(U32 equeue_id, sys_event_t* evt, U64 timeout) {
     return CELL_OK;
 }
 
-S32 sys_event_queue_tryreceive(U32 equeue_id, sys_event_t* event_array, S32 size, BE<S32>* number) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* equeue = lv2.objects.get<sys_event_queue_t>(equeue_id);
+HLE_FUNCTION(sys_event_queue_tryreceive, U32 equeue_id, sys_event_t* event_array, S32 size, BE<S32>* number) {
+    auto* equeue = kernel.objects.get<sys_event_queue_t>(equeue_id);
 
     // Check requisites
     if (!equeue) {
@@ -382,10 +348,8 @@ S32 sys_event_queue_tryreceive(U32 equeue_id, sys_event_t* event_array, S32 size
     return CELL_OK;
 }
 
-S32 sys_event_queue_drain(U32 equeue_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* equeue = lv2.objects.get<sys_event_queue_t>(equeue_id);
+HLE_FUNCTION(sys_event_queue_drain, U32 equeue_id) {
+    auto* equeue = kernel.objects.get<sys_event_queue_t>(equeue_id);
 
     // Check requisites
     if (!equeue) {

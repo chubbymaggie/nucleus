@@ -6,12 +6,13 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
 // SysCalls
-S32 sys_hid_0x1FE();
-S32 sys_hid_0x200();
-S32 sys_hid_0x202();
+HLE_FUNCTION(sys_hid_0x1FE);
+HLE_FUNCTION(sys_hid_0x200);
+HLE_FUNCTION(sys_hid_0x202);
 
 }  // namespace sys

@@ -4,6 +4,10 @@
  */
 
 #include "orbisos.h"
+#include "nucleus/logger/logger.h"
+#include "nucleus/filesystem/filesystem_host.h"
+#include "nucleus/filesystem/utils.h"
+#include "nucleus/system/scei/orbisos/orbis_self.h"
 
 #include "syscalls/orbis_dynlib.h"
 
@@ -13,7 +17,9 @@ namespace sys {
 namespace scei {
 namespace orbis {
 
-OrbisOS::OrbisOS() {
+OrbisOS::OrbisOS(Emulator* emulator)
+    : System(emulator)
+{
     // Add FreeBSD 9 syscalls referenced in libkernel.sprx (FW 1.62)
     //syscalls[0x000] = SYSCALL();
     //syscalls[0x001] = SYSCALL(sys_exit);
@@ -311,6 +317,31 @@ bool OrbisOS::init(U64 entry) {
     dynlib_load_prx_args args = {};
     args.path = "/system/common/lib/libkernel.sprx";
     return !sys_dynlib_load_prx(nullptr, &args);
+}
+
+bool OrbisOS::start(const std::string& path)
+{
+    // Initialize application filesystem devices
+    const fs::Path& processPath = fs::getProcessPath(path);
+    vfs.registerDevice(new fs::HostPathDevice("/app0/", processPath));
+
+    // Load ELF/SELF file
+    sys::scei::orbis::SELFLoader self;
+    auto file = fs::HostFileSystem::openFile(path, fs::Read);
+    if (!self.open(file.get())) {
+        logger.error(LOG_COMMON, "Invalid file given.");
+        return false;
+    }
+
+    void* entryBase = self.load();
+    if (self.getMachine() != sys::EM_X86_64) {
+        logger.error(LOG_COMMON, "Only PPC64 executables are allowed");
+        return false;
+    }
+
+    auto entry = reinterpret_cast<uintptr_t>(entryBase) + self.getEntry();
+    init(entry);
+    return true;
 }
 
 }  // namespace orbis

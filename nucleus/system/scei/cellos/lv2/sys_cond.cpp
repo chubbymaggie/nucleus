@@ -7,20 +7,18 @@
 #include "sys_mutex.h"
 #include "nucleus/emulator.h"
 #include "nucleus/logger/logger.h"
-#include "nucleus/system/scei/cellos/lv2.h"
+#include "../lv2.h"
 
 namespace sys {
 
-S32 sys_cond_create(BE<U32>* cond_id, U32 mutex_id, sys_cond_attribute_t* attr) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* mutex = lv2.objects.get<sys_mutex_t>(mutex_id);
+HLE_FUNCTION(sys_cond_create, BE<U32>* cond_id, U32 mutex_id, sys_cond_attribute_t* attr) {
+    auto* mutex = kernel.objects.get<sys_mutex_t>(mutex_id);
 
     // Check requisites
     if (!mutex) {
         return CELL_ESRCH;
     }
-    if (cond_id == nucleus.memory->ptr(0) || attr == nucleus.memory->ptr(0)) {
+    if (cond_id == kernel.memory->ptr(0) || attr == kernel.memory->ptr(0)) {
         return CELL_EFAULT;
     }
     if (attr->pshared != SYS_SYNC_PROCESS_SHARED && attr->pshared != SYS_SYNC_NOT_PROCESS_SHARED) {
@@ -37,23 +35,19 @@ S32 sys_cond_create(BE<U32>* cond_id, U32 mutex_id, sys_cond_attribute_t* attr) 
     cond->mutex = mutex;
     cond->attr = *attr;
 
-    *cond_id = lv2.objects.add(cond, SYS_COND_OBJECT);
+    *cond_id = kernel.objects.add(cond, SYS_COND_OBJECT);
     return CELL_OK;
 }
 
-S32 sys_cond_destroy(U32 cond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    if (!lv2.objects.remove(cond_id)) {
+HLE_FUNCTION(sys_cond_destroy, U32 cond_id) {
+    if (!kernel.objects.remove(cond_id)) {
         return CELL_ESRCH;
     }
     return CELL_OK;
 }
 
-S32 sys_cond_signal(U32 cond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* cond = lv2.objects.get<sys_cond_t>(cond_id);
+HLE_FUNCTION(sys_cond_signal, U32 cond_id) {
+    auto* cond = kernel.objects.get<sys_cond_t>(cond_id);
 
     // Check requisites
     if (!cond) {
@@ -64,10 +58,8 @@ S32 sys_cond_signal(U32 cond_id) {
     return CELL_OK;
 }
 
-S32 sys_cond_signal_all(U32 cond_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* cond = lv2.objects.get<sys_cond_t>(cond_id);
+HLE_FUNCTION(sys_cond_signal_all, U32 cond_id) {
+    auto* cond = kernel.objects.get<sys_cond_t>(cond_id);
 
     // Check requisites
     if (!cond) {
@@ -78,10 +70,8 @@ S32 sys_cond_signal_all(U32 cond_id) {
     return CELL_OK;
 }
 
-S32 sys_cond_signal_to(U32 cond_id, U32 thread_id) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* cond = lv2.objects.get<sys_cond_t>(cond_id);
+HLE_FUNCTION(sys_cond_signal_to, U32 cond_id, U32 thread_id) {
+    auto* cond = kernel.objects.get<sys_cond_t>(cond_id);
 
     // Check requisites
     if (!cond) {
@@ -93,10 +83,8 @@ S32 sys_cond_signal_to(U32 cond_id, U32 thread_id) {
     return CELL_OK;
 }
 
-S32 sys_cond_wait(U32 cond_id, U64 timeout) {
-    LV2& lv2 = static_cast<LV2&>(*nucleus.sys.get());
-
-    auto* cond = lv2.objects.get<sys_cond_t>(cond_id);
+HLE_FUNCTION(sys_cond_wait, U32 cond_id, U64 timeout) {
+    auto* cond = kernel.objects.get<sys_cond_t>(cond_id);
 
     // Check requisites
     if (!cond) {

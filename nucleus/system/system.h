@@ -7,11 +7,31 @@
 
 #include "nucleus/filesystem/filesystem_virtual.h"
 
+// Forward declarations
+class Emulator;
+
 namespace sys {
 
 class System {
+    Emulator* m_emulator;
+
 public:
     fs::VirtualFileSystem vfs;
+
+    System(Emulator* emulator);
+
+    /**
+     * Get the emulator object to which this HLE-OS belongs.
+     * @return  Emulator object
+     */
+    Emulator* getEmulator() const;
+
+    /**
+     * Start new process from the specified source.
+     * @param[in]  path  Executable path
+     * @return  True on success
+     */
+    virtual bool start(const std::string& path) = 0;
 };
 
 }  // namespace sys

@@ -6,10 +6,11 @@
 #pragma once
 
 #include "nucleus/common.h"
+#include "../hle_macro.h"
 
 namespace sys {
 
 // SysCalls
-S32 sys_gamepad_ycon_if();
+HLE_FUNCTION(sys_gamepad_ycon_if);
 
 }  // namespace sys
